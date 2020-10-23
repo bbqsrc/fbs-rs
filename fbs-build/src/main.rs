@@ -1,11 +1,11 @@
 /// Compile flatbuffers files from the command line.
-use butte_build::compile_fbs_generic;
+use fbs_build::compile_fbs_generic;
 
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
-    name = "butte",
+    name = "fbs",
     about = "Generate Rust code from a flatbuffer schema file."
 )]
 struct Opt {

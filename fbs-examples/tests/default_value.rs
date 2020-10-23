@@ -1,9 +1,9 @@
 pub mod tests {
-    butte_build::include_fbs!("default_value");
+    fbs_build::include_fbs!("default_value");
 }
 
 use anyhow::Result;
-use butte as fb;
+use fbs as fb;
 use tests::default_value;
 
 #[test]

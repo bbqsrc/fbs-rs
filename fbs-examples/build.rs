@@ -6,7 +6,7 @@ fn main() -> Result<()> {
         "fbs/default_value.fbs",
         "fbs/greeter/greeter.fbs",
     ] {
-        butte_build::compile_fbs(fbs)?;
+        fbs_build::compile_fbs(fbs)?;
     }
     Ok(())
 }

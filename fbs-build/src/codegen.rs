@@ -1,6 +1,6 @@
 use crate::{ast::types as ast, ir::types as ir};
 
-use butte::VOffsetT;
+use fbs::VOffsetT;
 use heck::{ShoutySnakeCase, SnakeCase};
 use itertools::Itertools;
 use proc_macro2::TokenStream;
@@ -137,10 +137,10 @@ fn to_type_token(
                 context_namespace,
                 ty,
                 lifetime,
-                &quote!(butte::ForwardsUOffset),
+                &quote!(fbs::ForwardsUOffset),
                 true,
             );
-            let ty = quote!(butte::Vector<#lifetime, #component_token>);
+            let ty = quote!(fbs::Vector<#lifetime, #component_token>);
 
             let wrap_tokens = wrap_refs_types.into_token_stream();
             if wrap_tokens.is_empty() || !wrap_outer {
@@ -255,14 +255,14 @@ mod to_default_value_tests {
     use crate::{ast::types as ast, ir::types as ir};
 
     macro_rules! generate_min_max_tests {
-        ($kind:path, $base_type:ty, $butte_ir_type:ident, $rust_type:ident $(,)?) => {
+        ($kind:path, $base_type:ty, $fbs_ir_type:ident, $rust_type:ident $(,)?) => {
             #[test]
             fn test_to_default_value_min() {
                 let raw_value = std::$rust_type::MIN;
                 let rust_value = raw_value as $base_type;
                 let value = ast::DefaultValue::Scalar($kind(rust_value));
                 let ty =
-                    to_type_token(None, &ir::Type::$butte_ir_type, &quote!(), &quote!(), false);
+                    to_type_token(None, &ir::Type::$fbs_ir_type, &quote!(), &quote!(), false);
                 let result = to_default_value(&ty, &value).to_string();
                 let expected = format!("{}{}", raw_value, stringify!($rust_type));
                 assert_eq!(result, expected);
@@ -274,7 +274,7 @@ mod to_default_value_tests {
                 let rust_value = raw_value as $base_type;
                 let value = ast::DefaultValue::Scalar($kind(rust_value));
                 let ty =
-                    to_type_token(None, &ir::Type::$butte_ir_type, &quote!(), &quote!(), false);
+                    to_type_token(None, &ir::Type::$fbs_ir_type, &quote!(), &quote!(), false);
                 let result = to_default_value(&ty, &value).to_string();
                 let expected = format!("{}{}", raw_value, stringify!($rust_type));
                 assert_eq!(result, expected);
@@ -292,15 +292,15 @@ mod to_default_value_tests {
     }
 
     macro_rules! generate_numeric_primitive_tests {
-        ([$(($ast_type:ident, $butte_ir_type:ident, $rust_type:ident)),*$(,)?]) => {
+        ([$(($ast_type:ident, $fbs_ir_type:ident, $rust_type:ident)),*$(,)?]) => {
             $(
                 #[allow(non_snake_case)]
-                mod $butte_ir_type {
+                mod $fbs_ir_type {
                     use super::*;
                     generate_min_max_tests!(
                         $crate::ast::types::Scalar::$ast_type,
                         base_type!($ast_type),
-                        $butte_ir_type,
+                        $fbs_ir_type,
                         $rust_type
                     );
                 }
@@ -396,13 +396,13 @@ impl ToTokens for ir::Table<'_> {
                  ..
              }| {
                 let arg_ty = if ty.is_union() {
-                    quote!(butte::WIPOffset<butte::UnionWIPOffset>)
+                    quote!(fbs::WIPOffset<fbs::UnionWIPOffset>)
                 } else {
                     let arg_ty = to_type_token(
                         table_ns_ref,
                         ty,
                         &quote!('a),
-                        &quote!(butte::WIPOffset),
+                        &quote!(fbs::WIPOffset),
                         true,
                     );
                     quote!(#arg_ty)
@@ -523,13 +523,13 @@ impl ToTokens for ir::Table<'_> {
             };
 
             let arg_ty = if ty.is_union() {
-                quote!(butte::WIPOffset<butte::UnionWIPOffset>)
+                quote!(fbs::WIPOffset<fbs::UnionWIPOffset>)
             } else {
                 let arg_ty = to_type_token(
                     table_ns_ref,
                     ty,
                     &quote!('b),
-                    &quote!(butte::WIPOffset),
+                    &quote!(fbs::WIPOffset),
                     true,
                 );
                 quote!(#arg_ty)
@@ -557,9 +557,9 @@ impl ToTokens for ir::Table<'_> {
 
         let field_offset_constants = fields.iter().enumerate().map(|(index, field)| {
             let offset_name = offset_id(field);
-            let offset_value = butte::field_index_to_field_offset(index as VOffsetT);
+            let offset_value = fbs::field_index_to_field_offset(index as VOffsetT);
             quote! {
-                pub const #offset_name: butte::VOffsetT = #offset_value;
+                pub const #offset_name: fbs::VOffsetT = #offset_value;
             }
         });
 
@@ -579,14 +579,14 @@ impl ToTokens for ir::Table<'_> {
                 table_ns_ref,
                 ty,
                 &quote!('_),
-                &quote!(butte::ForwardsUOffset),
+                &quote!(fbs::ForwardsUOffset),
                 false,
             );
             let ty_wrapped = to_type_token(
                 table_ns_ref,
                 ty,
                 &quote!('_),
-                &quote!(butte::ForwardsUOffset),
+                &quote!(fbs::ForwardsUOffset),
                 true,
             );
             let default_value = if let Some(default_value) = default_value {
@@ -632,22 +632,22 @@ impl ToTokens for ir::Table<'_> {
                             let variant_ty_wrapped = to_type_token(table_ns_ref,
                                 variant_ty,
                                 &quote!('_),
-                                &quote!(butte::ForwardsUOffset),
+                                &quote!(fbs::ForwardsUOffset),
                                 true,
                             );
                             quote! {
                                 #enum_ident::#variant_ident => #union_ident::#variant_ident(self.table
                                     .get::<#variant_ty_wrapped>(#struct_id::#offset_name, None)?
-                                    .ok_or_else(|| butte::Error::RequiredFieldMissing(#snake_name_str))?)
+                                    .ok_or_else(|| fbs::Error::RequiredFieldMissing(#snake_name_str))?)
                             }
                         },
                     );
                     quote! {
                         #[inline]
-                        pub fn #snake_name(&self) -> Result<#ty_ret, butte::Error> {
+                        pub fn #snake_name(&self) -> Result<#ty_ret, fbs::Error> {
                             Ok(match self.#type_snake_name()? {
                               #(#names_to_enum_variant,)*
-                              #enum_ident::None => return Err(butte::Error::RequiredFieldMissing(#snake_name_str))
+                              #enum_ident::None => return Err(fbs::Error::RequiredFieldMissing(#snake_name_str))
                             })
                         }
                     }
@@ -661,7 +661,7 @@ impl ToTokens for ir::Table<'_> {
                             let variant_ty_wrapped = to_type_token(table_ns_ref,
                                 variant_ty,
                                 &quote!('_),
-                                &quote!(butte::ForwardsUOffset),
+                                &quote!(fbs::ForwardsUOffset),
                                 true,
                             );
                             quote! {
@@ -674,7 +674,7 @@ impl ToTokens for ir::Table<'_> {
 
                     quote! {
                         #[inline]
-                        pub fn #snake_name(&self) -> Result<Option<#ty_ret>, butte::Error> {
+                        pub fn #snake_name(&self) -> Result<Option<#ty_ret>, fbs::Error> {
                             Ok(match self.#type_snake_name()? {
                               #(#names_to_enum_variant,)*
                               None | Some(#enum_ident::None) => None
@@ -687,10 +687,10 @@ impl ToTokens for ir::Table<'_> {
                     #doc
                     #[inline]
                     #allow_type_complexity
-                    pub fn #snake_name(&self) -> Result<#ty_ret, butte::Error> {
+                    pub fn #snake_name(&self) -> Result<#ty_ret, fbs::Error> {
                         Ok(self.table
                             .get::<#ty_wrapped>(#struct_id::#offset_name, #default_value)?
-                            .ok_or_else(|| butte::Error::RequiredFieldMissing(#snake_name_str))?)
+                            .ok_or_else(|| fbs::Error::RequiredFieldMissing(#snake_name_str))?)
                     }
                 }
             } else {
@@ -698,7 +698,7 @@ impl ToTokens for ir::Table<'_> {
                     #doc
                     #[inline]
                     #allow_type_complexity
-                    pub fn #snake_name(&self) -> Result<Option<#ty_ret>, butte::Error> {
+                    pub fn #snake_name(&self) -> Result<Option<#ty_ret>, fbs::Error> {
                         self.table
                             .get::<#ty_wrapped>(#struct_id::#offset_name, #default_value)
                     }
@@ -725,16 +725,16 @@ impl ToTokens for ir::Table<'_> {
             #[derive(Copy, Clone, Debug, PartialEq)]
             #doc
             pub struct #struct_id<B> {
-                table: butte::Table<B>,
+                table: fbs::Table<B>,
             }
 
-            impl<B> From<butte::Table<B>> for #struct_id<B> {
-                fn from(table: butte::Table<B>) -> Self {
+            impl<B> From<fbs::Table<B>> for #struct_id<B> {
+                fn from(table: fbs::Table<B>) -> Self {
                     Self { table }
                 }
             }
 
-            impl<B> From<#struct_id<B>> for butte::Table<B> {
+            impl<B> From<#struct_id<B>> for fbs::Table<B> {
                 fn from(s: #struct_id<B>) -> Self {
                     s.table
                 }
@@ -745,9 +745,9 @@ impl ToTokens for ir::Table<'_> {
                 #(#field_offset_constants)*
 
                 pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-                    fbb: &'mut_bldr mut butte::FlatBufferBuilder<'bldr>,
+                    fbb: &'mut_bldr mut fbs::FlatBufferBuilder<'bldr>,
                     args: &'args #args#args_lifetime_args
-                ) -> butte::WIPOffset<#struct_id<&'bldr [u8]>> {
+                ) -> fbs::WIPOffset<#struct_id<&'bldr [u8]>> {
                     let mut builder = #builder_type::new(fbb);
                     #(#builder_add_calls)*
                     builder.finish()
@@ -762,23 +762,23 @@ impl ToTokens for ir::Table<'_> {
                 // fields access
                 #(#field_accessors)*
 
-                pub fn get_root(buf: B) -> Result<Self, butte::Error> {
-                    let table = butte::Table::get_root(buf)?;
+                pub fn get_root(buf: B) -> Result<Self, fbs::Error> {
+                    let table = fbs::Table::get_root(buf)?;
                     Ok(Self { table })
                 }
             }
 
-            impl<'a> butte::Follow<'a> for #struct_id<&'a [u8]> {
+            impl<'a> fbs::Follow<'a> for #struct_id<&'a [u8]> {
                 type Inner = Self;
 
                 #[inline]
-                fn follow(buf: &'a [u8], loc: usize) -> Result<Self::Inner, butte::Error> {
-                    let table = butte::Table::new(buf, loc);
+                fn follow(buf: &'a [u8], loc: usize) -> Result<Self::Inner, fbs::Error> {
+                    let table = fbs::Table::new(buf, loc);
                     Ok(Self { table })
                 }
             }
 
-            impl<B> butte::FollowBuf for #struct_id<B>
+            impl<B> fbs::FollowBuf for #struct_id<B>
             where
                 B: std::convert::AsRef<[u8]>
             {
@@ -786,8 +786,8 @@ impl ToTokens for ir::Table<'_> {
                 type Inner = Self;
 
                 #[inline]
-                fn follow_buf(buf: Self::Buf, loc: usize) -> Result<Self::Inner, butte::Error> {
-                    let table = butte::Table::new(buf, loc);
+                fn follow_buf(buf: Self::Buf, loc: usize) -> Result<Self::Inner, fbs::Error> {
+                    let table = fbs::Table::new(buf, loc);
                     Ok(Self { table })
                 }
             }
@@ -801,15 +801,15 @@ impl ToTokens for ir::Table<'_> {
 
             //// builder
             pub struct #builder_type<'a, 'b> {
-                fbb: &'b mut butte::FlatBufferBuilder<'a>,
-                start: butte::WIPOffset<butte::TableUnfinishedWIPOffset>,
+                fbb: &'b mut fbs::FlatBufferBuilder<'a>,
+                start: fbs::WIPOffset<fbs::TableUnfinishedWIPOffset>,
             }
 
             impl<'a: 'b, 'b> #builder_type<'a, 'b> {
                 #(#builder_field_methods)*
 
                 #[inline]
-                pub fn new(fbb: &'b mut butte::FlatBufferBuilder<'a>) -> Self {
+                pub fn new(fbb: &'b mut fbs::FlatBufferBuilder<'a>) -> Self {
                     let start = fbb.start_table();
                     #builder_type {
                         fbb, start
@@ -817,10 +817,10 @@ impl ToTokens for ir::Table<'_> {
                 }
 
                 #[inline]
-                pub fn finish(self) -> butte::WIPOffset<#struct_id<&'a [u8]>> {
+                pub fn finish(self) -> fbs::WIPOffset<#struct_id<&'a [u8]>> {
                     let o = self.fbb.end_table(self.start);
                     #(#required_fields)*
-                    butte::WIPOffset::new(o.value())
+                    fbs::WIPOffset::new(o.value())
                 }
             }
         })
@@ -982,21 +982,21 @@ impl ToTokens for ir::Enum<'_> {
                 }
             }
 
-            impl<'a> butte::Follow<'a> for #enum_id {
+            impl<'a> fbs::Follow<'a> for #enum_id {
                 type Inner = Self;
 
-                fn follow(buf: &'a [u8], loc: usize) -> Result<Self::Inner, butte::Error> {
-                    let scalar = butte::read_scalar_at::<#base_type>(buf, loc)?;
+                fn follow(buf: &'a [u8], loc: usize) -> Result<Self::Inner, fbs::Error> {
+                    let scalar = fbs::read_scalar_at::<#base_type>(buf, loc)?;
                     <Self as std::convert::TryFrom<#base_type>>::try_from(scalar)
                 }
             }
 
             impl std::convert::TryFrom<#base_type> for #enum_id {
-                type Error = butte::Error;
+                type Error = fbs::Error;
                 fn try_from(value: #base_type) -> Result<Self, Self::Error> {
                     match value {
                         #(#from_base_to_enum_variants,)*
-                        _ => Err(butte::Error::UnknownEnumVariant)
+                        _ => Err(fbs::Error::UnknownEnumVariant)
                     }
                 }
             }
@@ -1009,13 +1009,13 @@ impl ToTokens for ir::Enum<'_> {
                 }
             }
 
-            impl butte::Push for #enum_id {
+            impl fbs::Push for #enum_id {
                 type Output = Self;
 
                 #[inline]
                 fn push(&self, dst: &mut [u8], _rest: &[u8]) {
                     let scalar = <#base_type>::from(*self);
-                    butte::emplace_scalar::<#base_type>(dst, scalar);
+                    fbs::emplace_scalar::<#base_type>(dst, scalar);
                 }
             }
 

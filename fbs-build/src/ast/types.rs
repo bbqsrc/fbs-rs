@@ -393,7 +393,7 @@ impl<'a> From<&'a str> for DefaultValue<'a> {
 }
 
 impl<'a> TryFrom<&Type<'a>> for DefaultValue<'a> {
-    type Error = butte::Error;
+    type Error = fbs::Error;
 
     fn try_from(ty: &Type<'a>) -> Result<Self, Self::Error> {
         match ty {
@@ -402,7 +402,7 @@ impl<'a> TryFrom<&Type<'a>> for DefaultValue<'a> {
             Type::Double | Type::Float | Type::Float32 | Type::Float64 => Some((0.0).into()),
             _ => Some(0.into()),
         }
-        .ok_or(butte::Error::NoTypeDefaultValue)
+        .ok_or(fbs::Error::NoTypeDefaultValue)
     }
 }
 

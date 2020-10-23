@@ -1,13 +1,13 @@
 use anyhow::{anyhow, Result};
-use butte as fb;
+use fbs as fb;
 
 pub mod greeter {
-    butte_build::include_fbs!("greeter");
+    fbs_build::include_fbs!("greeter");
 }
 
 fn main() -> Result<()> {
     use greeter::foo::bar::{
-        butte_gen::EitherHelloType, EitherHello, EitherHelloRequest, EitherHelloRequestArgs,
+        fbs_gen::EitherHelloType, EitherHello, EitherHelloRequest, EitherHelloRequestArgs,
         HelloReply, HelloReplyArgs, HelloRequest, HelloRequestArgs,
     };
     let mut builder = fb::FlatBufferBuilder::new();

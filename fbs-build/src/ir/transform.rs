@@ -330,7 +330,7 @@ impl<'a> Builder<'a> {
     fn generate_enum_for_union(&mut self, u: &ast::Union<'a>) -> Result<ir::Enum<'a>> {
         let enum_ident = format!("{}Type", u.id.raw);
         let ident = &self.make_fully_qualified_ident_relative(ir::QualifiedIdent::from(vec![
-            ir::Ident::from("butte_gen"),
+            ir::Ident::from("fbs_gen"),
             ir::Ident::from(enum_ident),
         ]));
         if let Some(CustomTypeStatus::Defined(..)) = self.types.get(ident) {
@@ -1138,10 +1138,10 @@ struct Vector3 {
             nodes: vec![
                 ir::Node::Namespace(
                     ir::Namespace::builder()
-                        .ident(ir::QualifiedIdent::parse_str("butte_gen"))
+                        .ident(ir::QualifiedIdent::parse_str("fbs_gen"))
                         .nodes(vec![ir::Node::Enum(
                             ir::Enum::builder()
-                                .ident(ir::QualifiedIdent::parse_str("butte_gen.AorBType"))
+                                .ident(ir::QualifiedIdent::parse_str("fbs_gen.AorBType"))
                                 .base_type(ir::EnumBaseType::UByte)
                                 .variants(vec![
                                     ir::EnumVariant::builder()
@@ -1180,7 +1180,7 @@ struct Vector3 {
                 ir::Node::Union(
                     ir::Union::builder()
                         .ident(ir::QualifiedIdent::from("AorB"))
-                        .enum_ident(ir::QualifiedIdent::parse_str("butte_gen.AorBType"))
+                        .enum_ident(ir::QualifiedIdent::parse_str("fbs_gen.AorBType"))
                         .variants(vec![
                             ir::UnionVariant::builder()
                                 .ident(ir::Ident::from("A"))
@@ -1238,10 +1238,10 @@ struct Vector3 {
             nodes: vec![
                 ir::Node::Namespace(
                     ir::Namespace::builder()
-                        .ident(ir::QualifiedIdent::parse_str("butte_gen"))
+                        .ident(ir::QualifiedIdent::parse_str("fbs_gen"))
                         .nodes(vec![ir::Node::Enum(
                             ir::Enum::builder()
-                                .ident(ir::QualifiedIdent::parse_str("butte_gen.AorBType"))
+                                .ident(ir::QualifiedIdent::parse_str("fbs_gen.AorBType"))
                                 .base_type(ir::EnumBaseType::UByte)
                                 .variants(vec![
                                     ir::EnumVariant::builder()
@@ -1284,7 +1284,7 @@ struct Vector3 {
                 ir::Node::Union(
                     ir::Union::builder()
                         .ident(ir::QualifiedIdent::from("AorB"))
-                        .enum_ident(ir::QualifiedIdent::parse_str("butte_gen.AorBType"))
+                        .enum_ident(ir::QualifiedIdent::parse_str("fbs_gen.AorBType"))
                         .variants(vec![
                             ir::UnionVariant::builder()
                                 .ident(ir::Ident::from("A"))
@@ -1318,7 +1318,7 @@ struct Vector3 {
                                 .ident(ir::Ident::from("a_or_b_type"))
                                 .ty(ir::Type::Custom(
                                     ir::CustomTypeRef::builder()
-                                        .ident(ir::QualifiedIdent::parse_str("butte_gen.AorBType"))
+                                        .ident(ir::QualifiedIdent::parse_str("fbs_gen.AorBType"))
                                         .ty(ir::CustomType::Enum {
                                             variants: vec![
                                                 ir::EnumVariant::builder()
@@ -1353,7 +1353,7 @@ struct Vector3 {
                                         .ident(ir::QualifiedIdent::from("AorB"))
                                         .ty(ir::CustomType::Union {
                                             enum_ident: ir::QualifiedIdent::parse_str(
-                                                "butte_gen.AorBType",
+                                                "fbs_gen.AorBType",
                                             ),
                                             variants: vec![
                                                 ir::UnionVariant {

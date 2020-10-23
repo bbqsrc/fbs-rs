@@ -1,0 +1,13 @@
+[package]
+name = "fbs"
+version = "0.6.0"
+edition = "2018"
+authors = ["Robert Winslow <hello@rwinslow.com>", "FlatBuffers Maintainers", "Fbs Maintainers"]
+license = "Apache-2.0"
+description = "Fbs FlatBuffers Rust runtime library."
+repository = "https://github.com/bbqsrc/fbs-rs/"
+keywords = ["flatbuffers", "serialization", "zero-copy"]
+categories = ["encoding", "data-structures", "memory-management"]
+
+[dependencies]
+smallvec = "1.4.2"

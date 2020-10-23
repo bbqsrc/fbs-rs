@@ -1,11 +1,11 @@
 //! Test for https://github.com/butte-rs/butte/issues/39
 
 pub mod tests {
-    butte_build::include_fbs!("array");
+    fbs_build::include_fbs!("array");
 }
 
 use anyhow::{anyhow, Result};
-use butte as fb;
+use fbs as fb;
 use tests::array;
 
 #[test]

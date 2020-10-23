@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "butte",
-    "butte-build",
-    "butte-examples",
+    "fbs",
+    "fbs-build",
+    "fbs-examples",
 ]

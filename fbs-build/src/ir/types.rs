@@ -1,6 +1,6 @@
 //! IR types.
 //!
-//! Intermediate representations for `butte-build` where types are semantically organized (e.g by
+//! Intermediate representations for `fbs-build` where types are semantically organized (e.g by
 //! namespace) and resolved so that type dependencies are known.
 //!
 //! IR types can also implement `ToTokens` because they contain all the required information to be
@@ -167,7 +167,7 @@ impl<'a> Type<'a> {
             // which are considered scalar if their contents
             // is scalar
 
-            // However they're not currently supported by butte's parser
+            // However they're not currently supported by fbs's parser
             Type::String | Type::Array(..) => false,
             Type::Custom(CustomTypeRef { ty, .. }) => match ty {
                 // Apparently only C++ impl supports union in structs

@@ -1,10 +1,10 @@
 [package]
-name = "butte-examples"
+name = "fbs-examples"
 version = "0.1.0"
 authors = ["Phillip Cloud <cpcloud@gmail.com>"]
 description = "Examples of how to use Butte"
 license = "MIT"
-repository = "https://github.com/butte-rs/butte"
+repository = "https://github.com/bbqsrc/fbs-rs"
 edition = "2018"
 keywords = ["examples", "flatbuffers", "flatbuffer", "codegen"]
 
@@ -13,14 +13,14 @@ name = "greeter"
 path = "src/greeter/greeter.rs"
 
 [dependencies]
-anyhow = "1.0.26"
-butte-build = { path = "../butte-build" }
-butte = { path = "../butte" }
+anyhow = "1.0.33"
+fbs-build = { path = "../fbs-build" }
+fbs = { path = "../fbs" }
 
 [build-dependencies]
-anyhow = "1.0.26"
-butte-build = { path = "../butte-build" }
+anyhow = "1.0.33"
+fbs-build = { path = "../fbs-build" }
 
 [dev-dependencies]
-anyhow = "1.0.26"
+anyhow = "1.0.33"
 assert_cmd = "1.0.1"
